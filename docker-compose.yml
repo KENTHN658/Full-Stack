@@ -1,0 +1,83 @@
+version: '3.9'
+
+services:
+
+  etcd:
+    image: bitnami/etcd:latest
+    container_name: etcd
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ENABLE_V2=true
+    ports:
+      - "2379:2379"
+    volumes:
+      - etcd-data:/bitnami/etcd
+
+  apisix:
+    image: apache/apisix:3.8.0-debian
+    container_name: apisix
+    depends_on:
+      - etcd
+    ports:
+      - "9080:9080"     # Public API port
+      - "9443:9443"     # HTTPS
+      - "9180:9180"     # Admin API
+    volumes:
+      - ./apisix/config.yaml:/usr/local/apisix/conf/config.yaml
+    environment:
+      - APISIX_ADMIN_KEY=${APISIX_ADMIN_KEY}
+
+  mariadb:
+    image: mariadb:10.5
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_NAME: wpdb
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppass
+    depends_on:
+      - mariadb
+
+  backend:
+    build: ./backend
+    container_name: gofiber-backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mariadb
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+
+  dashboard:
+    build: ./dashboard
+    container_name: react-dashboard
+    ports:
+      - "5173:5173"
+    depends_on:
+      - apisix
+
+volumes:
+  mariadb-data:
+  etcd-data:
