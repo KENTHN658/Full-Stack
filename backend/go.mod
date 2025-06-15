@@ -1,6 +1,7 @@
-module main.go
+module github.com/KENTHN658/Full-Stack/backend
 
-go 1.18
+go 1.21.0
+
 
 require (
 	github.com/go-sql-driver/mysql v1.9.3

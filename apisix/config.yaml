@@ -1,0 +1,22 @@
+apisix:
+  node_listen: 9080          # HTTP port
+  enable_admin: true
+  admin_key:
+    - name: admin
+      key: secretadminkey    # ตรงกับ React dashboard (X-API-KEY)
+      role: admin
+  config_center: etcd        # ใช้ etcd เป็นศูนย์กลาง config
+
+etcd:
+  host:
+    - "http://etcd:2379"     # ชื่อ service etcd จาก docker-compose
+
+plugin_attr:
+  prometheus:
+    export_addr:
+      ip: "0.0.0.0"
+      port: 9091
+  zipkin:
+    service_name: "apisix"
+    sample_ratio: 1
+    collector_host: "http://zipkin:9411/api/v2/spans"  # ชื่อ service zipkin จาก docker-compose 

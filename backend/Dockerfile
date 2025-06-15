@@ -2,7 +2,7 @@
 FROM golang:1.21-alpine
 
 # ตั้ง working directory
-WORKDIR /app
+WORKDIR /backend
 
 # คัดลอกโค้ดทั้งหมดเข้าไปใน image
 COPY . .
