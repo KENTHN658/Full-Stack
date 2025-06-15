@@ -1,31 +1,38 @@
 version: '3.9'
 
 services:
-
   etcd:
-    image: bitnami/etcd:latest
-    container_name: etcd
+    image: bitnami/etcd:3.5
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ENABLE_V2=true
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
     ports:
       - "2379:2379"
-    volumes:
-      - etcd-data:/bitnami/etcd
+
 
   apisix:
-    image: apache/apisix:3.8.0-debian
     container_name: apisix
+    image: apache/apisix:3.12.0-debian
     depends_on:
       - etcd
-    ports:
-      - "9080:9080"     # Public API port
-      - "9443:9443"     # HTTPS
-      - "9180:9180"     # Admin API
     volumes:
-      - ./apisix/config.yaml:/usr/local/apisix/conf/config.yaml
-    environment:
-      - APISIX_ADMIN_KEY=${APISIX_ADMIN_KEY}
+      - ./config/apisix.yaml:/usr/local/apisix/conf/config.yaml
+    ports:
+      - "9080:9080"   # HTTP
+      - "9443:9443"   # HTTPS
+      - "9180:9180"   # Admin API
+    restart: always
+
+  dashboard:
+    container_name: apisix-dashboard
+    image: apache/apisix-dashboard:3.0.1-alpine
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./config/dashboard.yaml:/usr/local/apisix-dashboard/conf/conf.yaml
+    restart: always
+
 
   mariadb:
     image: mariadb:10.5
