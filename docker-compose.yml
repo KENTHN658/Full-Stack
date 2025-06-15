@@ -77,7 +77,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
 
-  dashboard:
+  dashboard-react:
     build: ./dashboard
     container_name: react-dashboard
     ports:
