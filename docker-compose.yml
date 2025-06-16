@@ -82,6 +82,19 @@ services:
       DB_NAME: ${DB_NAME}
 
 
+  next-dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: Next-dashboard
+    ports:
+      - '3001:3000'   # host:container
+    volumes:
+      - ./dashboard:/usr/src/web
+      - /usr/src/web/node_modules
+      - /usr/src/web/.next
+    environment:
+      - NODE_ENV=development
 
 volumes:
   mariadb-data:
