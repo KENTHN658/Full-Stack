@@ -81,16 +81,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
 
-  dashboard-react:
-    build: ./dashboard
-    container_name: react-dashboard
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./dashboard:/app
-      - /app/node_modules
-    working_dir: /app
-    command: npm run dev
+
 
 volumes:
   mariadb-data:
