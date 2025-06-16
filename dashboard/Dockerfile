@@ -2,11 +2,11 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+COPY package*.json ./
+RUN npm install
+
 COPY . .
 
-# ติดตั้ง axios และ types ก่อน build
-RUN npm install
-RUN npm install axios @types/axios --save && npm run build
+EXPOSE 5173
 
-RUN npm install -g serve
-CMD ["serve", "-s", "dist", "-l", "5173"]
+CMD ["npm", "run", "dev"]

@@ -60,6 +60,10 @@ services:
       WORDPRESS_DB_NAME: wpdb
       WORDPRESS_DB_USER: wpuser
       WORDPRESS_DB_PASSWORD: wppass
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME','http://localhost:8080');
+        define('WP_SITEURL','http://localhost:8080');
+
     depends_on:
       - mariadb
 
@@ -82,8 +86,11 @@ services:
     container_name: react-dashboard
     ports:
       - "5173:5173"
-    depends_on:
-      - apisix
+    volumes:
+      - ./dashboard:/app
+      - /app/node_modules
+    working_dir: /app
+    command: npm run dev
 
 volumes:
   mariadb-data:
